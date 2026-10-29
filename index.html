@@ -45,8 +45,9 @@
         <div id="license-screen">
             <h2>🔑 Enter License Key</h2>
             <p>Protected Bot. Enter key to continue.</p>
-            <input type="text" id="key-input" class="license-input" placeholder="Enter key (e.g. GENZ-2026)" onkeypress="handleKeyPress(event)">
-            <div id="error-txt" class="error-msg">Invalid Key! Use: GENZ-2026</div>
+            <!-- type="password" lagane se key dots (***) ki shakal mein chup jaye gi -->
+            <input type="password" id="key-input" class="license-input" placeholder="Enter key..." onkeypress="handleKeyPress(event)">
+            <div id="error-txt" class="error-msg">Invalid Key! Please enter correct key.</div>
             <button class="btn-action" onclick="checkKey()">ACTIVATE BOT</button>
         </div>
 
@@ -105,7 +106,8 @@
             const inputVal = document.getElementById("key-input").value.trim();
             const errDiv = document.getElementById("error-txt");
             
-            if (inputVal === "GENZ-2026") {
+            // Nayi Key check ki ja rahi hai
+            if (inputVal === "2027_GENZ") {
                 document.getElementById("license-screen").style.display = "none";
                 document.getElementById("bot-main").style.display = "block";
             } else {
