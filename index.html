@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gen-Z Bot Pro</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #0b0e14; color: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        .bot-card { background-color: #121721; width: 100%; max-width: 360px; border-radius: 20px; padding: 20px; border: 1px solid #1e2638; box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.7); }
+        
+        #license-screen { text-align: center; padding: 10px 0; }
+        #license-screen h2 { color: #00e5ff; margin-bottom: 15px; font-size: 20px; }
+        #license-screen p { font-size: 12px; color: #a0aec0; margin-bottom: 20px; }
+        .license-input { width: 100%; background-color: #1a2233; color: #fff; border: 1px solid #2a354d; padding: 12px; border-radius: 10px; font-size: 14px; text-align: center; margin-bottom: 15px; outline: none; }
+        .error-msg { color: #ff3355; font-size: 11px; margin-bottom: 10px; display: none; }
+
+        #bot-main { display: none; }
+        .header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #1a2233; }
+        .header .title { font-weight: bold; color: #00e5ff; display: flex; align-items: center; gap: 6px; }
+        .live-badge { background-color: rgba(0, 229, 255, 0.15); color: #00e5ff; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        select { background-color: #1a2233; color: #fff; border: 1px solid #2a354d; padding: 10px; border-radius: 10px; font-size: 12px; outline: none; cursor: pointer; width: 100%; }
+        .signal-display-wrapper { position: relative; width: 180px; height: 180px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; }
+        .signal-circle { width: 160px; height: 160px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; transition: all 0.4s ease; box-shadow: 0 0 25px rgba(255, 170, 0, 0.3); border: 3px solid #ffaa00; background: radial-gradient(circle, rgba(255, 170, 0, 0.2) 0%, rgba(18, 23, 33, 0.9) 80%); }
+        .signal-circle.wait { border-color: #ffaa00; box-shadow: 0 0 30px rgba(255, 170, 0, 0.4); background: radial-gradient(circle, rgba(255, 170, 0, 0.2) 0%, rgba(18, 23, 33, 0.9) 80%); }
+        .signal-circle.buy { border-color: #00ff66; box-shadow: 0 0 35px rgba(0, 255, 102, 0.5); background: radial-gradient(circle, rgba(0, 255, 102, 0.25) 0%, rgba(18, 23, 33, 0.9) 80%); }
+        .signal-circle.sell { border-color: #ff3355; box-shadow: 0 0 35px rgba(255, 51, 85, 0.5); background: radial-gradient(circle, rgba(255, 51, 85, 0.25) 0%, rgba(18, 23, 33, 0.9) 80%); }
+        .circle-icon { font-size: 38px; margin-bottom: 5px; }
+        .circle-title { font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+        .circle-sub { font-size: 11px; color: #a0aec0; margin-top: 2px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box { background-color: #161c2b; border: 1px solid #222c40; border-radius: 12px; padding: 10px; text-align: center; }
+        .stat-label { font-size: 10px; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .stat-value { font-size: 14px; font-weight: bold; color: #00e5ff; }
+        .btn-action { width: 100%; background: linear-gradient(90deg, #0052cc 0%, #00d2ff 100%); color: #ffffff; border: none; padding: 14px; font-size: 14px; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 150, 255, 0.3); }
+        .btn-action:active { transform: scale(0.98); }
+        .warning-box { margin-top: 15px; background: rgba(255, 170, 0, 0.08); border: 1px solid rgba(255, 170, 0, 0.2); border-radius: 8px; padding: 8px 10px; font-size: 10px; color: #ffcc66; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="bot-card">
+        <!-- License Screen -->
+        <div id="license-screen">
+            <h2>🔑 Enter License Key</h2>
+            <p>Protected Bot. Enter key to continue.</p>
+            <input type="text" id="key-input" class="license-input" placeholder="Enter key (e.g. GENZ-2026)" onkeypress="handleKeyPress(event)">
+            <div id="error-txt" class="error-msg">Invalid Key! Use: GENZ-2026</div>
+            <button class="btn-action" onclick="checkKey()">ACTIVATE BOT</button>
+        </div>
+
+        <!-- Main Bot Screen -->
+        <div id="bot-main">
+            <div class="header">
+                <div class="title">⚡ Gen-Z Bot</div>
+                <div class="live-badge">LIVE AI</div>
+            </div>
+
+            <div class="controls">
+                <select id="pair">
+                    <option value="EUR/USD (OTC)">EUR/USD (OTC)</option>
+                    <option value="GBP/USD (OTC)">GBP/USD (OTC)</option>
+                    <option value="USD/JPY (OTC)">USD/JPY (OTC)</option>
+                    <option value="AUD/CAD (OTC)">AUD/CAD (OTC)</option>
+                    <option value="BTC/USD">Crypto IDX / BTC</option>
+                </select>
+                <select id="timeframe">
+                    <option value="30 SEC">30 SEC</option>
+                    <option value="1 MIN">1 MIN</option>
+                    <option value="2 MIN">2 MIN</option>
+                    <option value="5 MIN">5 MIN</option>
+                </select>
+            </div>
+
+            <div class="signal-display-wrapper">
+                <div id="circle" class="signal-circle wait">
+                    <div id="circle-icon" class="circle-icon">⏸️</div>
+                    <div id="circle-title" class="circle-title" style="color: #ffaa00;">WAIT</div>
+                    <div id="circle-sub" class="circle-sub">Click to Analyze</div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">📊 STRENGTH</div>
+                    <div id="strength-val" class="stat-value">NORMAL</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">🎯 ACCURACY</div>
+                    <div id="accuracy-val" class="stat-value">---</div>
+                </div>
+            </div>
+
+            <button id="action-btn" class="btn-action" onclick="generateSignal()">GENERATE SIGNAL ▶</button>
+
+            <div class="warning-box">
+                ⚠️ MARKET WARNING: Wait for analysis before entering trade.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkKey() {
+            const inputVal = document.getElementById("key-input").value.trim();
+            const errDiv = document.getElementById("error-txt");
+            
+            if (inputVal === "GENZ-2026") {
+                document.getElementById("license-screen").style.display = "none";
+                document.getElementById("bot-main").style.display = "block";
+            } else {
+                errDiv.style.display = "block";
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                checkKey();
+            }
+        }
+
+        let isAnalyzing = false;
+        function generateSignal() {
+            if (isAnalyzing) return;
+            isAnalyzing = true;
+
+            const btn = document.getElementById("action-btn");
+            const circle = document.getElementById("circle");
+            const icon = document.getElementById("circle-icon");
+            const title = document.getElementById("circle-title");
+            const sub = document.getElementById("circle-sub");
+            const strength = document.getElementById("strength-val");
+            const accuracy = document.getElementById("accuracy-val");
+
+            btn.disabled = true;
+            btn.innerText = "ANALYZING MARKET...";
+            circle.className = "signal-circle wait";
+            icon.innerText = "⏳";
+            title.style.color = "#ffaa00";
+
+            let percent = 0;
+            const interval = setInterval(() => {
+                percent += 10;
+                title.innerText = percent + "%";
+                sub.innerText = "Scanning volatility...";
+
+                if (percent >= 100) {
+                    clearInterval(interval);
+                    showFinalSignal();
+                }
+            }, 150);
+
+            function showFinalSignal() {
+                const signals = ["BUY", "SELL"];
+                const isBuy = signals[Math.floor(Math.random() * signals.length)] === "BUY";
+                const randomAccuracy = Math.floor(Math.random() * 14) + 83;
+
+                if (isBuy) {
+                    circle.className = "signal-circle buy";
+                    icon.innerText = "↗️";
+                    title.innerText = "BUY";
+                    title.style.color = "#00ff66";
+                    sub.innerText = "CALL / HIGH";
+                } else {
+                    circle.className = "signal-circle sell";
+                    icon.innerText = "↘️";
+                    title.innerText = "SELL";
+                    title.style.color = "#ff3355";
+                    sub.innerText = "PUT / LOW";
+                }
+
+                strength.innerText = "MAXIMUM";
+                accuracy.innerText = randomAccuracy + "%";
+                btn.disabled = false;
+                btn.innerText = "GENERATE NEXT SIGNAL ▶";
+                isAnalyzing = false;
+            }
+        }
+    </script>
+</body>
+</html>
